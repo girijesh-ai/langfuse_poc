@@ -1,0 +1,43 @@
+# Staging Environment Configuration
+
+environment: staging
+
+langfuse:
+  host: https://cloud.langfuse.com
+  
+  sdk:
+    flush_interval: 3000
+    batch_size: 50
+    debug: false
+  
+  default_tags:
+    - staging
+    - pre-production
+
+observability:
+  trace_all_llm_calls: true
+  capture_inputs: true
+  capture_outputs: true
+
+evaluation:
+  enabled: true
+  triggers:
+    - on_user_feedback_negative
+    - random_sampling_10_percent
+
+prompts:
+  default_label: staging
+  versioning:
+    require_review: true
+
+cost_tracking:
+  enabled: true
+  alerts:
+    daily_budget: 200
+
+monitoring:
+  alerts:
+    - type: error_rate
+      threshold: 0.1
+      channels: [slack]
+

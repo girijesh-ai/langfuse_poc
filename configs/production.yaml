@@ -1,0 +1,172 @@
+# Production Environment Configuration for Langfuse
+
+environment: production
+
+langfuse:
+  host: https://cloud.langfuse.com
+  # For US region: https://us.cloud.langfuse.com
+  # For HIPAA: https://hipaa.cloud.langfuse.com
+  
+  # SDK Configuration
+  sdk:
+    flush_interval: 5000  # milliseconds
+    batch_size: 100
+    max_retries: 3
+    timeout: 30000
+    enabled: true
+    debug: false
+  
+  # Sampling (optional - for high-volume applications)
+  sampling:
+    enabled: false
+    rate: 0.1  # Sample 10% of traces
+  
+  # Tags for filtering
+  default_tags:
+    - production
+    - api-v2
+  
+  # Metadata
+  default_metadata:
+    deployment: kubernetes
+    region: us-west-2
+    version: "{{GIT_SHA}}"
+
+# Observability Settings
+observability:
+  trace_all_llm_calls: true
+  capture_inputs: true
+  capture_outputs: true
+  capture_metadata: true
+  
+  # PII Masking (implement in application layer)
+  pii_masking:
+    enabled: true
+    fields:
+      - email
+      - phone
+      - ssn
+      - credit_card
+  
+  # Performance
+  async_ingestion: true
+  batching: true
+
+# Evaluation Configuration
+evaluation:
+  enabled: true
+  
+  # Automated evaluations
+  llm_as_judge:
+    enabled: true
+    provider: openai:gpt-4o-mini
+    temperature: 0.1
+    
+  # Evaluation triggers
+  triggers:
+    - on_user_feedback_negative
+    - on_error
+    - random_sampling_1_percent
+  
+  # Score thresholds for alerts
+  thresholds:
+    quality_score: 0.7
+    hallucination_score: 0.2
+    relevance_score: 0.8
+
+# Prompt Management
+prompts:
+  default_label: production
+  cache_ttl: 3600  # seconds
+  
+  # Versioning strategy
+  versioning:
+    auto_label_on_approval: true
+    require_review: true
+  
+  # A/B Testing
+  ab_testing:
+    enabled: true
+    traffic_split:
+      variant_a: 0.5
+      variant_b: 0.5
+
+# Cost Management
+cost_tracking:
+  enabled: true
+  alerts:
+    daily_budget: 1000  # USD
+    monthly_budget: 25000
+    per_user_threshold: 10
+  
+  # Cost optimization
+  model_selection:
+    default: gpt-4o-mini
+    fallback: gpt-3.5-turbo
+    premium_users: gpt-4o
+
+# Monitoring & Alerting
+monitoring:
+  health_check_interval: 60  # seconds
+  
+  alerts:
+    - type: error_rate
+      threshold: 0.05  # 5%
+      window: 300  # 5 minutes
+      channels: [slack, pagerduty]
+    
+    - type: latency_p95
+      threshold: 5000  # milliseconds
+      window: 300
+      channels: [slack]
+    
+    - type: cost_spike
+      threshold: 1.5x  # 50% increase
+      window: 3600
+      channels: [slack, email]
+
+# Rate Limiting
+rate_limiting:
+  enabled: true
+  requests_per_minute: 10000
+  burst_size: 500
+
+# Data Retention
+data_retention:
+  traces: 365  # days (Pro/Enterprise)
+  scores: 730
+  prompts: indefinite
+
+# Compliance
+compliance:
+  gdpr: true
+  hipaa: false  # Set true if using HIPAA region
+  data_residency: US
+  audit_logging: true
+
+# Integration Settings
+integrations:
+  posthog:
+    enabled: true
+    api_key: "{{POSTHOG_API_KEY}}"
+  
+  mixpanel:
+    enabled: false
+  
+  slack:
+    enabled: true
+    webhook_url: "{{SLACK_WEBHOOK_URL}}"
+    channels:
+      alerts: "#langfuse-alerts"
+      reports: "#langfuse-reports"
+
+# Caching
+caching:
+  prompts:
+    enabled: true
+    ttl: 3600
+  
+  api_keys:
+    enabled: true
+    ttl: 300
+

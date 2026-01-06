@@ -1,0 +1,36 @@
+{
+  "name": "langfuse-poc",
+  "version": "1.0.0",
+  "description": "Langfuse Platform Pilot Project - LLM Observability and Engineering",
+  "type": "module",
+  "scripts": {
+    "demo": "node examples/nodejs/basic-tracing.js",
+    "demo:openai": "node examples/nodejs/openai-integration.js",
+    "demo:prompt": "node examples/nodejs/prompt-management.js",
+    "setup": "npm install && echo 'Please copy .env.example to .env and add your API keys'"
+  },
+  "keywords": [
+    "langfuse",
+    "llm",
+    "observability",
+    "tracing",
+    "prompt-management",
+    "evaluation"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@langfuse/tracing": "^1.0.0",
+    "@langfuse/otel": "^1.0.0",
+    "@langfuse/client": "^1.0.0",
+    "@opentelemetry/sdk-node": "^0.45.0",
+    "openai": "^4.0.0",
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

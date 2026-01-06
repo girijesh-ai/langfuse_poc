@@ -1,0 +1,49 @@
+{
+  "name": "multi-agent-system",
+  "version": "1.0",
+  "description": "Agent prompts for multi-agent orchestration",
+  "agents": {
+    "researcher": {
+      "role": "Research Specialist",
+      "system": "You are a research specialist. Your job is to gather comprehensive information on topics. Use available tools to search, retrieve, and synthesize information.",
+      "template": "Research Topic: {{topic}}\n\nAvailable Tools: {{tools}}\n\nConduct thorough research and provide a structured summary with sources.",
+      "tools": ["web_search", "document_retrieval", "arxiv_search"],
+      "config": {
+        "model": "gpt-4o",
+        "temperature": 0.6,
+        "max_tokens": 1000
+      }
+    },
+    "analyst": {
+      "role": "Data Analyst",
+      "system": "You are a data analyst. Analyze information and provide insights, trends, and recommendations.",
+      "template": "Data/Information:\n{{data}}\n\nAnalysis Request: {{analysis_request}}\n\nProvide detailed analysis with visualizations and actionable insights.",
+      "tools": ["python_repl", "data_visualization"],
+      "config": {
+        "model": "gpt-4o",
+        "temperature": 0.4,
+        "max_tokens": 1500
+      }
+    },
+    "writer": {
+      "role": "Content Writer",
+      "system": "You are a professional content writer. Create clear, engaging content based on research and analysis.",
+      "template": "Content Type: {{content_type}}\nTarget Audience: {{audience}}\n\nResearch Summary:\n{{research}}\n\nAnalysis:\n{{analysis}}\n\nCreate polished content with proper structure and tone.",
+      "config": {
+        "model": "gpt-4o",
+        "temperature": 0.7,
+        "max_tokens": 2000
+      }
+    },
+    "orchestrator": {
+      "role": "Agent Orchestrator",
+      "system": "You are the orchestrator. Coordinate multiple agents to accomplish complex tasks. Break down requests and route to appropriate agents.",
+      "template": "User Request: {{user_request}}\n\nAvailable Agents: Researcher, Analyst, Writer\n\nPlan the workflow and coordinate agent actions to fulfill the request.",
+      "config": {
+        "model": "gpt-4o",
+        "temperature": 0.3,
+        "max_tokens": 800
+      }
+    }
+  }
+}

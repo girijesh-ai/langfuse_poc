@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  langfuse-app:
+    build: .
+    container_name: langfuse-demo-app
+    environment:
+      - LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY}
+      - LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY}
+      - LANGFUSE_HOST=${LANGFUSE_HOST:-https://cloud.langfuse.com}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LANGFUSE_ENVIRONMENT=docker
+    volumes:
+      - ./examples:/app/examples
+      - ./prompts:/app/prompts
+      - ./datasets:/app/datasets
+    networks:
+      - langfuse-network
+    restart: unless-stopped
+
+  # Optional: Local Langfuse instance (self-hosted)
+  langfuse-server:
+    image: langfuse/langfuse:latest
+    container_name: langfuse-server
+    depends_on:
+      - postgres
+      - clickhouse
+      - redis
+    environment:
+      - DATABASE_URL=postgresql://langfuse:langfuse@postgres:5432/langfuse
+      - CLICKHOUSE_URL=http://clickhouse:8123
+      - CLICKHOUSE_USER=default
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-changeme}
+      - NEXTAUTH_URL=http://localhost:3000
+      - SALT=${SALT:-changeme}
+    ports:
+      - "3000:3000"
+    networks:
+      - langfuse-network
+    profiles:
+      - self-hosted
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: langfuse-postgres
+    environment:
+      - POSTGRES_USER=langfuse
+      - POSTGRES_PASSWORD=langfuse
+      - POSTGRES_DB=langfuse
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - langfuse-network
+    profiles:
+      - self-hosted
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: langfuse-clickhouse
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+    networks:
+      - langfuse-network
+    profiles:
+      - self-hosted
+
+  redis:
+    image: redis:7-alpine
+    container_name: langfuse-redis
+    volumes:
+      - redis-data:/data
+    networks:
+      - langfuse-network
+    profiles:
+      - self-hosted
+
+networks:
+  langfuse-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  clickhouse-data:
+  redis-data:
+

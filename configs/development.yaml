@@ -1,0 +1,47 @@
+# Development Environment Configuration
+
+environment: development
+
+langfuse:
+  host: https://cloud.langfuse.com
+  
+  sdk:
+    flush_interval: 1000
+    batch_size: 10
+    debug: true
+    enabled: true
+  
+  default_tags:
+    - development
+    - local
+
+observability:
+  trace_all_llm_calls: true
+  capture_inputs: true
+  capture_outputs: true
+  async_ingestion: true
+
+evaluation:
+  enabled: true
+  llm_as_judge:
+    enabled: true
+    provider: openai:gpt-4o-mini
+
+prompts:
+  default_label: development
+  cache_ttl: 60
+
+cost_tracking:
+  enabled: true
+  alerts:
+    daily_budget: 50
+
+monitoring:
+  alerts: []
+
+rate_limiting:
+  enabled: false
+
+compliance:
+  audit_logging: false
+

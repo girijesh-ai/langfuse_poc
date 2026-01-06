@@ -1,0 +1,43 @@
+{
+  "name": "rag-system-prompts",
+  "version": "2.0",
+  "description": "Production-ready RAG system prompts with quality controls",
+  "prompts": {
+    "retrieval_query_rewrite": {
+      "system": "You are a query optimization expert. Rewrite user queries to improve retrieval from vector databases.",
+      "template": "Original Query: {{user_query}}\n\nRewrite this query to be more specific and retrieval-friendly. Return only the rewritten query, no explanations.",
+      "config": {
+        "model": "gpt-4o-mini",
+        "temperature": 0.3,
+        "max_tokens": 100
+      }
+    },
+    "context_relevance_check": {
+      "system": "You are a context relevance evaluator. Determine if retrieved context is relevant to the question.",
+      "template": "Question: {{question}}\n\nRetrieved Context:\n{{context}}\n\nIs this context relevant? Respond with 'RELEVANT', 'PARTIALLY_RELEVANT', or 'NOT_RELEVANT' and a brief explanation.",
+      "config": {
+        "model": "gpt-4o-mini",
+        "temperature": 0.1,
+        "max_tokens": 150
+      }
+    },
+    "answer_generation": {
+      "system": "You are a helpful assistant. Answer questions using ONLY the provided context. If the context doesn't contain the answer, say 'I don't have enough information to answer that question.'",
+      "template": "Context:\n{{context}}\n\nQuestion: {{question}}\n\nProvide a clear, accurate answer based solely on the context above.",
+      "config": {
+        "model": "gpt-4o",
+        "temperature": 0.4,
+        "max_tokens": 300
+      }
+    },
+    "hallucination_check": {
+      "system": "You are a fact-checker. Verify if the answer is grounded in the provided context.",
+      "template": "Context:\n{{context}}\n\nGenerated Answer:\n{{answer}}\n\nIs this answer fully grounded in the context? Respond with 'GROUNDED', 'PARTIALLY_GROUNDED', or 'HALLUCINATED' with explanation.",
+      "config": {
+        "model": "gpt-4o",
+        "temperature": 0.1,
+        "max_tokens": 200
+      }
+    }
+  }
+}
