@@ -321,8 +321,9 @@ def main():
     print(f"\nView traces in: {os.getenv('LANGFUSE_HOST')}")
     print("="*70 + "\n")
     
-    from langfuse import get_client
-    get_client().flush()
+    from langfuse.client import Langfuse
+    Langfuse().flush()
+
 
 
 if __name__ == "__main__":
