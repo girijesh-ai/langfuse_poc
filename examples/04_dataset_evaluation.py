@@ -163,8 +163,8 @@ def main():
         print(f"Error: {e}\n")
     
     # Flush
-    from langfuse import client
-    client.flush()
+    from langfuse.client import Langfuse
+    Langfuse().flush()
 
 
 

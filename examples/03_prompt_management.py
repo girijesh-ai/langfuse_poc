@@ -143,8 +143,8 @@ def main():
         print("Note: Create the prompt in Langfuse UI first or run create_prompts()\n")
     
     # Flush
-    from langfuse import client
-    client.flush()
+    from langfuse.client import Langfuse
+    Langfuse().flush()
 
 
 

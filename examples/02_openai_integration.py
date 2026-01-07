@@ -194,8 +194,8 @@ def main():
         print("Make sure OPENAI_API_KEY is set in your .env file\n")
 
     # Flush to ensure all traces are sent
-    from langfuse import client
-    client.flush()
+    from langfuse.client import Langfuse
+    Langfuse().flush()
 
 
 

@@ -112,9 +112,9 @@ def main():
     print("="*60 + "\n")
 
     # Important: Flush to ensure all traces are sent
-    from langfuse import client
-    client.flush()
-
+    from langfuse.client import Langfuse
+    Langfuse().flush()
+    
 
 
 if __name__ == "__main__":

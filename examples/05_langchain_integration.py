@@ -191,8 +191,8 @@ def main():
         print("Ensure langchain and langchain-openai are installed:")
         print("  pip install langchain langchain-openai\n")
     
-    from langfuse import client
-    client.flush()
+    from langfuse.client import Langfuse
+    Langfuse().flush()
 
 
 

@@ -321,8 +321,8 @@ def main():
     print(f"\nView traces in: {os.getenv('LANGFUSE_HOST')}")
     print("="*70 + "\n")
     
-    from langfuse import client
-    client.flush()
+    from langfuse.client import Langfuse
+    Langfuse().flush()
 
 
 
