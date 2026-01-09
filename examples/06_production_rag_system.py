@@ -238,27 +238,22 @@ class ProductionRAGSystem:
             # Step 5: Score the result (v3 pattern)
             langfuse = get_client()
 
-            trace_id = langfuse.get_current_trace_id()
-            
-            # Add quality scores
-            langfuse.score(
-                trace_id=trace_id,
+            # Add quality scores using score_current_trace (v3 API)
+            langfuse.score_current_trace(
                 name="context_relevance",
                 value=avg_relevance,
                 comment=f"Average relevance across {len(contexts)} contexts"
             )
             
-            langfuse.score(
-                trace_id=trace_id,
+            langfuse.score_current_trace(
                 name="hallucination_check",
                 value=hallucination_check['score'],
-                comment=hallucination_check['explanation']
+                comment=hallucination_check['explanation'][:200]  # Truncate for comment
             )
             
             # Overall quality score
             quality_score = (avg_relevance + hallucination_check['score']) / 2
-            langfuse.score(
-                trace_id=trace_id,
+            langfuse.score_current_trace(
                 name="overall_quality",
                 value=quality_score
             )

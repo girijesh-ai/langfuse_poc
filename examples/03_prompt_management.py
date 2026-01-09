@@ -11,8 +11,7 @@ This example demonstrates:
 
 import os
 from dotenv import load_dotenv
-from langfuse import Langfuse
-from langfuse.decorators import observe
+from langfuse import Langfuse, observe
 
 load_dotenv()
 

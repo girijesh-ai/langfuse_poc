@@ -102,23 +102,31 @@ def run_experiment():
     
     experiment_name = "gpt-4o-mini-experiment-v1"
     
-    # Run each test case
+    # Run each test case using v3 API with item.run() context manager
     for item in dataset.items:
         question = item.input["question"]
         print(f"Testing: {question}")
         
-        # Run system
-        result = qa_system(question)
-        
-        # Create dataset run item
-        langfuse.create_dataset_run_item(
-            dataset_item_id=item.id,
+        # Use item.run() context manager for automatic trace linking
+        with item.run(
             run_name=experiment_name,
-            output={"answer": result},
-            metadata={"model": "gpt-4o-mini", "temperature": 0.3}
-        )
+            run_description="QA evaluation experiment",
+            run_metadata={"model": "gpt-4o-mini", "temperature": 0.3}
+        ) as root_span:
+            # Run the QA system
+            result = qa_system(question)
+            
+            # Optionally score the result
+            root_span.score_trace(
+                name="experiment_run",
+                value=1.0,
+                comment="Completed successfully"
+            )
         
         print(f"Result: {result[:80]}...\n")
+    
+    # Flush to ensure all data is sent
+    langfuse.flush()
     
     print(f"Experiment '{experiment_name}' completed")
     print("View results in Langfuse dashboard\n")

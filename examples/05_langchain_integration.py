@@ -36,10 +36,7 @@ def example_simple_chain():
     print("="*60 + "\n")
     
     # Initialize Langfuse callback
-    langfuse_handler = CallbackHandler(
-        tags=["langchain", "simple-chain"],
-        session_id="langchain-demo-session"
-    )
+    langfuse_handler = CallbackHandler()
     
     # Create chain
     llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
@@ -66,10 +63,7 @@ def example_multi_step_chain():
     print("Example 5.2: Multi-Step Chain")
     print("="*60 + "\n")
     
-    langfuse_handler = CallbackHandler(
-        tags=["langchain", "multi-step"],
-        session_id="langchain-demo-session"
-    )
+    langfuse_handler = CallbackHandler()
     
     # Step 1: Extract key points
     llm = ChatOpenAI(model="gpt-4o-mini")
@@ -112,11 +106,7 @@ def example_rag_chain():
     print("Example 5.3: RAG Chain")
     print("="*60 + "\n")
     
-    langfuse_handler = CallbackHandler(
-        tags=["langchain", "rag"],
-        user_id="demo-user",
-        session_id="rag-session-001"
-    )
+    langfuse_handler = CallbackHandler()
     
     # Simulate retrieval
     def retrieve_context(query: str) -> str:
