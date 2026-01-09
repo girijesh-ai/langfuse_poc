@@ -1,5 +1,5 @@
-# Langfuse SDK
-langfuse>=2.0.0
+# Langfuse SDK (v3 - Latest with OpenTelemetry support)
+langfuse>=3.0.0
 
 # LLM Provider SDKs
 openai>=1.0.0

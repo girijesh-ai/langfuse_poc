@@ -193,9 +193,9 @@ def main():
         print(f"\nError: {e}")
         print("Make sure OPENAI_API_KEY is set in your .env file\n")
 
-    # Flush to ensure all traces are sent
+    # Shutdown to ensure all traces are sent and resources cleaned up (v3 pattern)
     from langfuse import get_client
-    get_client().flush()
+    get_client().shutdown()
 
 
 if __name__ == "__main__":

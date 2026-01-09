@@ -10,7 +10,7 @@ This example demonstrates:
 
 import os
 from dotenv import load_dotenv
-from langfuse.decorators import observe, langfuse_context
+from langfuse import observe, get_client
 
 # Load environment variables
 load_dotenv()
@@ -24,8 +24,9 @@ def retrieve_context(query: str) -> str:
     # Simulate database lookup
     context = f"Context for '{query}': This is relevant information from our knowledge base."
 
-    # Update current observation with metadata
-    langfuse_context.update_current_observation(
+    # Update current observation with metadata (v3 pattern)
+    langfuse = get_client()
+    langfuse.update_current_observation(
         metadata={"retrieval_method": "vector_search", "results_count": 3}
     )
 
@@ -40,8 +41,9 @@ def generate_response(query: str, context: str) -> str:
     # Simulate LLM call
     response = f"Based on the context, here's the answer: {query} relates to our knowledge base."
 
-    # Update with generation metadata
-    langfuse_context.update_current_observation(
+    # Update with generation metadata (v3 pattern)
+    langfuse = get_client()
+    langfuse.update_current_observation(
         input={"query": query, "context": context},
         output=response,
         metadata={
@@ -62,8 +64,9 @@ def rag_pipeline(user_query: str) -> dict:
     """
     print(f"\nProcessing query: {user_query}")
 
-    # Update current trace metadata
-    langfuse_context.update_current_trace(
+    # Update current trace metadata (v3 pattern)
+    langfuse = get_client()
+    langfuse.update_current_trace(
         user_id="user-123",
         session_id="session-456",
         tags=["rag", "production"],
@@ -111,9 +114,9 @@ def main():
     print(f"URL: {os.getenv('LANGFUSE_HOST', 'https://cloud.langfuse.com')}")
     print("="*60 + "\n")
 
-    # Important: Flush to ensure all traces are sent
-    from langfuse import get_client
-    get_client().flush()
+    # Important: Shutdown to ensure all traces are sent and resources cleaned up (v3 pattern)
+    langfuse = get_client()
+    langfuse.shutdown()
 
 
 if __name__ == "__main__":

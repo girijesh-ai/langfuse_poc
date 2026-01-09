@@ -11,8 +11,7 @@ This example demonstrates:
 
 import os
 from dotenv import load_dotenv
-from langfuse import Langfuse
-from langfuse.decorators import observe
+from langfuse import Langfuse, observe
 
 load_dotenv()
 
@@ -161,10 +160,10 @@ def main():
         
     except Exception as e:
         print(f"Error: {e}\n")
-    
-    # Flush
+
+    # Shutdown to ensure all traces are sent and resources cleaned up (v3 pattern)
     from langfuse import get_client
-    get_client().flush()
+    get_client().shutdown()
 
 
 if __name__ == "__main__":

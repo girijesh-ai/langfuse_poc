@@ -190,9 +190,10 @@ def main():
         print(f"\nError: {e}")
         print("Ensure langchain and langchain-openai are installed:")
         print("  pip install langchain langchain-openai\n")
-    
+
+    # Shutdown to ensure all traces are sent and resources cleaned up (v3 pattern)
     from langfuse import get_client
-    get_client().flush()
+    get_client().shutdown()
 
 
 if __name__ == "__main__":

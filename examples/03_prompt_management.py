@@ -141,10 +141,10 @@ def main():
     except Exception as e:
         print(f"Error: {e}")
         print("Note: Create the prompt in Langfuse UI first or run create_prompts()\n")
-    
-    # Flush
+
+    # Shutdown to ensure all traces are sent and resources cleaned up (v3 pattern)
     from langfuse import get_client
-    get_client().flush()
+    get_client().shutdown()
 
 
 if __name__ == "__main__":

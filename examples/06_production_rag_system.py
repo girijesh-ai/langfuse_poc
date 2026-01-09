@@ -13,7 +13,7 @@ Demonstrates:
 import os
 from typing import List, Dict, Any
 from dotenv import load_dotenv
-from langfuse.decorators import observe, langfuse_context
+from langfuse import observe, get_client
 from langfuse.openai import openai
 
 load_dotenv()
@@ -56,9 +56,10 @@ class ProductionRAGSystem:
         
         # Filter based on query (simplified)
         results = knowledge_base[:top_k]
-        
-        # Update observation with retrieval metadata
-        langfuse_context.update_current_observation(
+
+        # Update observation with retrieval metadata (v3 pattern)
+        langfuse = get_client()
+        langfuse.update_current_observation(
             input=query,
             output=results,
             metadata={
@@ -67,7 +68,7 @@ class ProductionRAGSystem:
                 "retrieval_method": "vector_similarity"
             }
         )
-        
+
         return results
     
     @observe(as_type="generation")
@@ -134,16 +135,17 @@ class ProductionRAGSystem:
         )
         
         answer = response.choices[0].message.content
-        
-        # Update observation with context info
-        langfuse_context.update_current_observation(
+
+        # Update observation with context info (v3 pattern)
+        langfuse = get_client()
+        langfuse.update_current_observation(
             metadata={
                 "num_contexts": len(contexts),
                 "model": self.generation_model,
                 "context_length": len(combined_context)
             }
         )
-        
+
         return answer
     
     @observe(as_type="evaluator")
@@ -187,9 +189,10 @@ class ProductionRAGSystem:
     def query(self, user_query: str) -> Dict[str, Any]:
         """Main RAG query method with full observability."""
         print(f"Processing query: {user_query}")
-        
-        # Update trace metadata
-        langfuse_context.update_current_trace(
+
+        # Update trace metadata (v3 pattern)
+        langfuse = get_client()
+        langfuse.update_current_trace(
             user_id="production-user",
             session_id="rag-session",
             tags=["rag", "production", "quality-checked"]
@@ -232,11 +235,10 @@ class ProductionRAGSystem:
             )
             print(f"Hallucination check: {hallucination_check['status']}")
             
-            # Step 5: Score the result
-            from langfuse import Langfuse
-            langfuse = Langfuse()
-            
-            trace_id = langfuse_context.get_current_trace_id()
+            # Step 5: Score the result (v3 pattern)
+            langfuse = get_client()
+
+            trace_id = langfuse.get_current_trace_id()
             
             # Add quality scores
             langfuse.score(
@@ -276,12 +278,13 @@ class ProductionRAGSystem:
             
         except Exception as e:
             print(f"Error in RAG pipeline: {e}")
-            
-            # Log error
-            langfuse_context.update_current_trace(
+
+            # Log error (v3 pattern)
+            langfuse = get_client()
+            langfuse.update_current_trace(
                 metadata={"error": str(e), "error_type": type(e).__name__}
             )
-            
+
             raise
 
 
@@ -320,9 +323,10 @@ def main():
     print("  - Full trace observability")
     print(f"\nView traces in: {os.getenv('LANGFUSE_HOST')}")
     print("="*70 + "\n")
-    
-    from langfuse import get_client
-    get_client().flush()
+
+    # Shutdown to ensure all traces are sent and resources cleaned up (v3 pattern)
+    langfuse = get_client()
+    langfuse.shutdown()
 
 
 if __name__ == "__main__":
