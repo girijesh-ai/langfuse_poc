@@ -57,9 +57,9 @@ class ProductionRAGSystem:
         # Filter based on query (simplified)
         results = knowledge_base[:top_k]
 
-        # Update observation with retrieval metadata (v3 pattern)
+        # Update span with retrieval metadata (v3 API - retriever is a span type)
         langfuse = get_client()
-        langfuse.update_current_observation(
+        langfuse.update_current_span(
             input=query,
             output=results,
             metadata={
@@ -136,9 +136,9 @@ class ProductionRAGSystem:
         
         answer = response.choices[0].message.content
 
-        # Update observation with context info (v3 pattern)
+        # Update generation with context info (v3 API - this is a generation type)
         langfuse = get_client()
-        langfuse.update_current_observation(
+        langfuse.update_current_generation(
             metadata={
                 "num_contexts": len(contexts),
                 "model": self.generation_model,

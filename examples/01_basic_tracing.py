@@ -24,9 +24,9 @@ def retrieve_context(query: str) -> str:
     # Simulate database lookup
     context = f"Context for '{query}': This is relevant information from our knowledge base."
 
-    # Update current observation with metadata (v3 pattern)
+    # Update current span with metadata (v3 API)
     langfuse = get_client()
-    langfuse.update_current_observation(
+    langfuse.update_current_span(
         metadata={"retrieval_method": "vector_search", "results_count": 3}
     )
 
@@ -41,9 +41,9 @@ def generate_response(query: str, context: str) -> str:
     # Simulate LLM call
     response = f"Based on the context, here's the answer: {query} relates to our knowledge base."
 
-    # Update with generation metadata (v3 pattern)
+    # Update with generation metadata (v3 API)
     langfuse = get_client()
-    langfuse.update_current_observation(
+    langfuse.update_current_span(
         input={"query": query, "context": context},
         output=response,
         metadata={
