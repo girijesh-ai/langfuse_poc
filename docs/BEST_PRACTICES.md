@@ -27,11 +27,11 @@ def calculate(expression):
 ### 2. Add Rich Metadata
 
 ```python
-from langfuse.decorators import observe, langfuse_context
+from langfuse import observe, get_client
 
 @observe()
 def process_request(user_id, request_type):
-    langfuse_context.update_current_trace(
+    get_client().update_current_trace(
         user_id=user_id,
         session_id=f"session-{user_id}",
         tags=[request_type, "production"],
@@ -46,13 +46,15 @@ def process_request(user_id, request_type):
 ### 3. Implement Proper Session Tracking
 
 ```python
+from langfuse import observe, get_client
+
 # Multi-turn conversation
 session_id = generate_session_id()
 
 for turn in conversation:
     @observe()
     def handle_turn(message):
-        langfuse_context.update_current_trace(
+        get_client().update_current_trace(
             session_id=session_id,  # Links all turns
             metadata={"turn": turn["number"]}
         )
@@ -67,8 +69,8 @@ def lambda_handler(event, context):
     # Process event
     result = process_event(event)
     
-    # IMPORTANT: Flush before exit
-    get_client().flush()
+    # IMPORTANT: Shutdown before exit (v3 pattern)
+    get_client().shutdown()
     
     return result
 ```
@@ -135,10 +137,9 @@ for item in dataset.items:
 def handle_request(query):
     result = qa_system(query)
     
-    # Collect user feedback
+    # Collect user feedback using v3 API
     if user_feedback:
-        langfuse.score(
-            trace_id=trace_id,
+        get_client().score_current_trace(
             name="user_feedback",
             value=user_feedback
         )
@@ -149,26 +150,30 @@ def handle_request(query):
 ### 2. Use Multiple Evaluation Metrics
 
 ```python
+from langfuse import get_client
+
+langfuse = get_client()
+
 # Quality
-langfuse.score(trace_id, "accuracy", 0.9)
+langfuse.score_current_trace(name="accuracy", value=0.9)
 
 # Performance
-langfuse.score(trace_id, "latency", 1250, comment="ms")
+langfuse.score_current_trace(name="latency", value=1250, comment="ms")
 
 # Cost
-langfuse.score(trace_id, "cost_efficiency", 0.8)
+langfuse.score_current_trace(name="cost_efficiency", value=0.8)
 
 # User satisfaction
-langfuse.score(trace_id, "user_rating", 5, comment="5-star")
+langfuse.score_current_trace(name="user_rating", value=5, comment="5-star")
 ```
 
 ### 3. Automated Evaluation Pipeline
 
 ```python
-from langfuse.decorators import observe
+from langfuse import observe, get_client
 
 @observe()
-def automated_evaluation(trace_id, output, expected):
+def automated_evaluation(output, expected):
     # Accuracy check
     accuracy = check_accuracy(output, expected)
     
@@ -178,10 +183,11 @@ def automated_evaluation(trace_id, output, expected):
     # Relevance check
     relevance = check_relevance(output)
     
-    # Submit scores
-    langfuse.score(trace_id, "accuracy", accuracy)
-    langfuse.score(trace_id, "hallucination", hallucination)
-    langfuse.score(trace_id, "relevance", relevance)
+    # Submit scores using v3 API
+    langfuse = get_client()
+    langfuse.score_current_trace(name="accuracy", value=accuracy)
+    langfuse.score_current_trace(name="hallucination", value=hallucination)
+    langfuse.score_current_trace(name="relevance", value=relevance)
 ```
 
 ## Cost Optimization
@@ -212,8 +218,10 @@ compiled = prompt.compile(vars)  # Cached
 ### 3. Token Optimization
 
 ```python
+from langfuse import get_client
+
 # Track token usage
-langfuse_context.update_current_observation(
+get_client().update_current_span(
     usage={
         "input": input_tokens,
         "output": output_tokens,
@@ -352,8 +360,8 @@ def complex_operation(data):
 
 ## Common Pitfalls to Avoid
 
-1. **Not calling flush() in scripts**
-   - Always call `get_client().flush()` before exit
+1. **Not calling shutdown() in scripts**
+   - Always call `get_client().shutdown()` before exit
 
 2. **Overly generic trace names**
    - Use descriptive names: "chat-completion" not "process"

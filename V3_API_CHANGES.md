@@ -78,14 +78,54 @@ from langfuse import observe, get_client
 
 When migrating from v2 to v3:
 
-- [ ] Update `requirements.txt`: `langfuse>=2.0.0` → `langfuse>=3.0.0`
-- [ ] Change imports: `from langfuse.decorators import ...` → `from langfuse import ...`
-- [ ] Replace `langfuse_context` with `get_client()`
-- [ ] Replace `update_current_observation()` with:
+- [x] Update `requirements.txt`: `langfuse>=2.0.0` → `langfuse>=3.0.0`
+- [x] Change imports: `from langfuse.decorators import ...` → `from langfuse import ...`
+- [x] Replace `langfuse_context` with `get_client()`
+- [x] Replace `update_current_observation()` with:
   - `update_current_span()` for spans (most common)
   - `update_current_generation()` for generations
-- [ ] Replace `flush()` with `shutdown()`
-- [ ] Test all examples with API keys configured
+- [x] Replace `flush()` with `shutdown()`
+- [x] Replace `langfuse.score(trace_id, ...)` with `get_client().score_current_trace(...)`
+- [x] Replace `create_dataset_run_item()` with `item.run()` context manager
+- [x] Test all examples with API keys configured
+
+### 5. Scoring API Changes
+
+**❌ OLD (v2):**
+```python
+langfuse.score(
+    trace_id=trace_id,
+    name="quality",
+    value=0.9
+)
+```
+
+**✅ NEW (v3):**
+```python
+from langfuse import get_client
+
+get_client().score_current_trace(
+    name="quality",
+    value=0.9
+)
+```
+
+### 6. Dataset Evaluation Changes
+
+**❌ OLD (v2):**
+```python
+langfuse.create_dataset_run_item(
+    dataset_item_id=item.id,
+    run_name="experiment-v1"
+)
+```
+
+**✅ NEW (v3):**
+```python
+with item.run(run_name="experiment-v1") as root_span:
+    result = my_function()
+    root_span.score_trace(name="quality", value=0.9)
+```
 
 ## Resources
 

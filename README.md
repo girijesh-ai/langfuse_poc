@@ -273,17 +273,21 @@ After running examples, view results at https://cloud.langfuse.com:
 
 ### 1. Structured Tracing
 ```python
+from langfuse import observe, get_client
+
 @observe()
 def my_function():
     # Automatically creates a span
-    langfuse_context.update_current_observation(
+    get_client().update_current_span(
         metadata={"key": "value"}
     )
 ```
 
 ### 2. User Context Tracking
 ```python
-langfuse_context.update_current_trace(
+from langfuse import get_client
+
+get_client().update_current_trace(
     user_id="user-123",
     session_id="session-456",
     tags=["production", "web"]
@@ -319,7 +323,7 @@ response = openai.chat.completions.create(
 
 ### Pattern 1: Decorator-Based (Python)
 ```python
-from langfuse.decorators import observe
+from langfuse import observe
 
 @observe()
 def process_request(input):

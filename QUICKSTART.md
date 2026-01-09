@@ -210,7 +210,7 @@ python examples/04_dataset_evaluation.py
 Create `my_example.py`:
 
 ```python
-from langfuse.decorators import observe, langfuse_context
+from langfuse import observe, get_client
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -219,7 +219,8 @@ load_dotenv()
 def my_function(input_text):
     """Your custom function."""
     # Add metadata
-    langfuse_context.update_current_observation(
+    langfuse = get_client()
+    langfuse.update_current_span(
         metadata={"custom_field": "custom_value"}
     )
 
@@ -238,7 +239,7 @@ if __name__ == "__main__":
 
     # Flush to send traces
     from langfuse import get_client
-    get_client().flush()
+    get_client().shutdown()
 ```
 
 Run it:
@@ -253,7 +254,9 @@ View in dashboard immediately!
 Update any example to track users:
 
 ```python
-langfuse_context.update_current_trace(
+from langfuse import get_client
+
+get_client().update_current_trace(
     user_id="your-user-id",
     session_id="your-session-id",
     tags=["custom-tag"]
@@ -269,9 +272,8 @@ Add scores to traces:
 ```python
 from langfuse import get_client
 
-client = get_client()
-client.score(
-    trace_id="trace-id",
+langfuse = get_client()
+langfuse.score_current_trace(
     name="quality",
     value=0.95,  # 0-1 scale
     comment="Excellent response"
@@ -526,7 +528,7 @@ OPENAI_API_KEY=sk-...              # From OpenAI
 
 ### Basic Tracing
 ```python
-from langfuse.decorators import observe
+from langfuse import observe
 
 @observe()
 def my_function():
@@ -535,9 +537,9 @@ def my_function():
 
 ### Update Trace
 ```python
-from langfuse.decorators import langfuse_context
+from langfuse import get_client
 
-langfuse_context.update_current_trace(
+get_client().update_current_trace(
     user_id="user-123",
     session_id="session-456",
     tags=["tag1", "tag2"]
@@ -554,7 +556,7 @@ response = openai.chat.completions.create(...)
 ### Flush Traces
 ```python
 from langfuse import get_client
-get_client().flush()
+get_client().shutdown()  # Use shutdown() in v3 for proper cleanup
 ```
 
 ## Useful Commands

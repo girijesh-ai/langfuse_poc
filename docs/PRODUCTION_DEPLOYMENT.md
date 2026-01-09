@@ -81,7 +81,7 @@ All Langfuse SDKs use async ingestion by default. Traces are sent in background 
 
 ```python
 import random
-from langfuse.decorators import observe
+from langfuse import observe
 
 @observe()
 def process_request(request):
@@ -150,7 +150,7 @@ integrations:
 
 ```python
 import re
-from langfuse.decorators import observe
+from langfuse import observe
 
 def mask_pii(text: str) -> str:
     """Mask PII before sending to Langfuse."""
@@ -299,7 +299,7 @@ Test failover procedures quarterly:
 
 1. Check API keys are correct
 2. Verify network connectivity to Langfuse
-3. Ensure `flush()` is called before app exit
+3. Ensure `shutdown()` is called before app exit
 4. Check SDK version compatibility
 
 ### High Latency

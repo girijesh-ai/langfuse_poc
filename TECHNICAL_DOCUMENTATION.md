@@ -1353,7 +1353,7 @@ flowchart TB
     D1 --> D2[Configure decorator]
     D2 --> D3[Auto trace creation]
 
-    CONTEXT --> C1[with langfuse_context]
+    CONTEXT --> C1[with get_client]
     C1 --> C2[Manual observations]
     C2 --> C3[Explicit control]
 
